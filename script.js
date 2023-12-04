@@ -31,10 +31,16 @@ async function helloTriangle() {
 
                      @vertex fn vsmain(@builtin(vertex_index) VertexIndex: u32) -> Vertex
                      {
-                         var pos: array<vec2<f32>, 3> = array<vec2<f32>, 3>(
-                             vec2<f32>( 0.0,  0.5),
-                             vec2<f32>(-0.5, -0.5),
-                             vec2<f32>( 0.5, -0.5)
+                         var disp = 0.3f;
+
+                         var pos: array<vec2<f32>, 6> = array<vec2<f32>, 6>(
+                             vec2<f32>( 0.0-disp,  0.5),
+                             vec2<f32>(-0.5-disp, -0.5),
+                             vec2<f32>( 0.5-disp, -0.5),
+
+                             vec2<f32>( 0.0+disp,  0.5),
+                             vec2<f32>(-0.5+disp, -0.5),
+                             vec2<f32>( 0.5+disp, -0.5)
                          );
                          var vertex_out : Vertex;
                          vertex_out.Position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);
@@ -46,12 +52,10 @@ async function helloTriangle() {
 
                      @fragment fn fsmain(in: Vertex) -> @location(0) vec4<f32>
                      {
-                         // float4 color = float4(sin(input.position.x / 10.0f), sin(input.position.y / 10.0f), cos((input.position.x + input.position.y) / 10.0f), 1);
-
-                         var comp1  = sin(in.Position.x / 10.0f);
-                         var comp2  = sin(in.Position.y / 10.0f);
-                         var comp3  = cos((in.Position.x + in.Position.y) / 10.0f);
-                         var outColor = vec4<f32>(comp1, comp2, comp3, 1.0);
+                         var r  = sin(in.Position.x / 10.0f);
+                         var g  = sin(in.Position.y / 10.0f);
+                         var b  = cos((in.Position.x + in.Position.y) / 10.0f);
+                         var outColor = vec4<f32>(r, g, b, 1.0);
 
                          return outColor;
                      }
@@ -120,6 +124,7 @@ async function helloTriangle() {
     const vertexBufferSlot = 0;
     renderPassEncoder.setVertexBuffer(vertexBufferSlot, vertexBuffer, 0);
     renderPassEncoder.draw(3, 1, 0, 0); // 3 vertices, 1 instance, 0th vertex, 0th instance.
+    renderPassEncoder.draw(3, 1, 3, 0); // 3 vertices, 1 instance, 0th vertex, 0th instance.
     renderPassEncoder.end();
     
     /* GPUComamndBuffer */
