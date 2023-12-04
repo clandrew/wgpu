@@ -39,15 +39,21 @@ async function helloTriangle() {
                          var vertex_out : Vertex;
                          vertex_out.Position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);
 
-                        var r = 1.0f;
-                        vertex_out.color = vec4<f32>(r, 0.0, 0.0, 1.0);
+                         vertex_out.color = vec4<f32>(1.0, 0.0, 0.0, 1.0);
 
                          return vertex_out;
                      }
 
                      @fragment fn fsmain(in: Vertex) -> @location(0) vec4<f32>
                      {
-                         return in.color;
+                         // float4 color = float4(sin(input.position.x / 10.0f), sin(input.position.y / 10.0f), cos((input.position.x + input.position.y) / 10.0f), 1);
+
+                         var comp1  = sin(in.Position.x / 10.0f);
+                         var comp2  = sin(in.Position.y / 10.0f);
+                         var comp3  = cos((in.Position.x + in.Position.y) / 10.0f);
+                         var outColor = vec4<f32>(comp1, comp2, comp3, 1.0);
+
+                         return outColor;
                      }
     `;
     const shaderModule = device.createShaderModule({ code: wgslSource });
