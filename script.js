@@ -31,16 +31,23 @@ async function helloTriangle() {
 
                      @vertex fn vsmain(@builtin(vertex_index) VertexIndex: u32) -> Vertex
                      {
-                         var disp = 0.3f;
+                         var xdisp = 0.3f;
+                         var ydisp0 = -0.4f;
+                         var ydisp1 = 0.4f;
 
-                         var pos: array<vec2<f32>, 6> = array<vec2<f32>, 6>(
-                             vec2<f32>( 0.0-disp,  0.5),
-                             vec2<f32>(-0.5-disp, -0.5),
-                             vec2<f32>( 0.5-disp, -0.5),
 
-                             vec2<f32>( 0.0+disp,  0.5),
-                             vec2<f32>(-0.5+disp, -0.5),
-                             vec2<f32>( 0.5+disp, -0.5)
+                         var pos: array<vec2<f32>, 9> = array<vec2<f32>, 9>(
+                             vec2<f32>( 0.0-xdisp,  0.5-ydisp0),
+                             vec2<f32>(-0.5-xdisp, -0.5-ydisp0),
+                             vec2<f32>( 0.5-xdisp, -0.5-ydisp0),
+
+                             vec2<f32>( 0.0+xdisp,  0.5-ydisp0),
+                             vec2<f32>(-0.5+xdisp, -0.5-ydisp0),
+                             vec2<f32>( 0.5+xdisp, -0.5-ydisp0),
+
+                             vec2<f32>( 0.0,  0.5-ydisp1),
+                             vec2<f32>(-0.5, -0.5-ydisp1),
+                             vec2<f32>( 0.5, -0.5-ydisp1)
                          );
                          var vertex_out : Vertex;
                          vertex_out.Position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);
@@ -124,7 +131,8 @@ async function helloTriangle() {
     const vertexBufferSlot = 0;
     renderPassEncoder.setVertexBuffer(vertexBufferSlot, vertexBuffer, 0);
     renderPassEncoder.draw(3, 1, 0, 0); // 3 vertices, 1 instance, 0th vertex, 0th instance.
-    renderPassEncoder.draw(3, 1, 3, 0); // 3 vertices, 1 instance, 0th vertex, 0th instance.
+    renderPassEncoder.draw(3, 1, 3, 0);
+    renderPassEncoder.draw(3, 1, 6, 0); 
     renderPassEncoder.end();
     
     /* GPUComamndBuffer */
