@@ -37,7 +37,6 @@ async function helloTriangle() {
 
                      @vertex fn vsmain(@builtin(vertex_index) VertexIndex: u32) -> Vertex
                      {
-
                          var pos: array<vec2<f32>, 3> = array<vec2<f32>, 3>(
                              vec2<f32>( 0.0,  0.5),
                              vec2<f32>(-0.5, -0.5),
@@ -47,9 +46,7 @@ async function helloTriangle() {
                          var vertex_out : Vertex;
                          vertex_out.Position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);
 
-                         //vertex_out.Position = uniforms.modelViewProjectionMatrix * vertex_out.Position;
-
-                         vertex_out.color = vec4<f32>(1.0, 0.0, 0.0, 1.0);
+                         vertex_out.Position = uniforms.modelViewProjectionMatrix * vertex_out.Position;
 
                          return vertex_out;
                      }
@@ -153,14 +150,14 @@ async function helloTriangle() {
             },
         ],
     });
-    let transformationMatrix = new ArrayBuffer(4 * 16);
-    transformationMatrix[0] = 1;
+    const transformationMatrix = new Float32Array(16);
+    transformationMatrix[0] = 2;
     transformationMatrix[1] = 0;
     transformationMatrix[2] = 0;
     transformationMatrix[3] = 0;
 
     transformationMatrix[4] = 0;
-    transformationMatrix[5] = 1;
+    transformationMatrix[5] = 2;
     transformationMatrix[6] = 0;
     transformationMatrix[7] = 0;
 
@@ -175,6 +172,17 @@ async function helloTriangle() {
     transformationMatrix[15] = 1;
     
     /*** Rendering ***/
+
+    /* GPUQueue */
+    const queue = device.queue;
+
+    device.queue.writeBuffer(
+        uniformBuffer, /* buffer */
+        0, /* buffer offset */
+        transformationMatrix, /* data */
+        0, /* data offset */
+        16 /* size in elements for TypedArray, bytes otherwise */
+    );
     
     /* GPUCommandEncoder */
     const commandEncoder = device.createCommandEncoder();
@@ -192,17 +200,6 @@ async function helloTriangle() {
     
     /* GPUComamndBuffer */
     const commandBuffer = commandEncoder.finish();
-    
-    /* GPUQueue */
-    const queue = device.queue;
-
-    device.queue.writeBuffer(
-        uniformBuffer, /* buffer */
-        0, /* buffer offset */
-        transformationMatrix, /* data */
-        0, /* data offset */
-        uniformBufferSize /* size */
-    );
 
     queue.submit([commandBuffer]);
 }
