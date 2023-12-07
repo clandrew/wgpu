@@ -7,13 +7,13 @@ async function helloTriangle() {
 
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter.requestDevice();
-    
+
     /*** Vertex Buffer Setup ***/
-    
+
     /* Vertex Data */
     const vertexStride = 8 * 4;
     const vertexDataSize = vertexStride * 3;
-    
+
     /* GPUBufferDescriptor */
     const vertexDataBufferDescriptor = {
         size: vertexDataSize,
@@ -22,9 +22,14 @@ async function helloTriangle() {
 
     /* GPUBuffer */
     const vertexBuffer = device.createBuffer(vertexDataBufferDescriptor);
-    
+
     /*** Shader Setup ***/
     const wgslSource = `
+                     struct UniformBuffer {
+                         modelViewProjectionMatrix : mat4x4<f32>
+                     }
+                     @binding(0) @group(0) var<uniform> uniforms : UniformBuffer;
+  
                      struct Vertex {
                          @builtin(position) Position: vec4<f32>,
                          @location(0) color: vec4<f32>,
@@ -38,10 +43,11 @@ async function helloTriangle() {
                              vec2<f32>(-0.5, -0.5),
                              vec2<f32>( 0.5, -0.5)
                          );
+
                          var vertex_out : Vertex;
                          vertex_out.Position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);
 
-                         // Here: multiply projection
+                         //vertex_out.Position = uniforms.modelViewProjectionMatrix * vertex_out.Position;
 
                          vertex_out.color = vec4<f32>(1.0, 0.0, 0.0, 1.0);
 
@@ -59,16 +65,35 @@ async function helloTriangle() {
                      }
     `;
     const shaderModule = device.createShaderModule({ code: wgslSource });
-    
+
     /* GPUPipelineStageDescriptors */
-    const vertexStageDescriptor = { module: shaderModule, entryPoint: "vsmain" };
+    const vertexStageDescriptor =
+    {
+        module: shaderModule,
+        entryPoint: "vsmain" // Vertex attributes go here if there are any
+    };
+
+    /* GPUPipelineLayout */
+    const bindGroupLayout = device.createBindGroupLayout({
+        entries: [
+        {
+            binding: 0,
+            visibility: GPUShaderStage.VERTEX,
+            buffer: {}
+        }
+        ]
+    });
+
+    const pipelineLayout = device.createPipelineLayout({
+        bindGroupLayouts: [bindGroupLayout],
+    });
 
     const fragmentStageDescriptor = { module: shaderModule, entryPoint: "fsmain", targets: [ {format: "bgra8unorm" }, ],  };
     
     /* GPURenderPipelineDescriptor */
 
     const renderPipelineDescriptor = {
-        layout: 'auto',
+        layout: pipelineLayout,
         vertex: vertexStageDescriptor,
         fragment: fragmentStageDescriptor,
         primitive: {topology: "triangle-list" },
@@ -111,19 +136,6 @@ async function helloTriangle() {
     /* GPURenderPassDescriptor */
     const renderPassDescriptor = { colorAttachments: [colorAttachmentDescriptor] };
 
-    /* Bind group layout*/
-    const bindGroupLayout = device.createBindGroupLayout({
-        entries: [
-            {
-                binding: 0,
-                visibility: GPUShaderStage.FRAGMENT | GPUShaderStage.VERTEX,
-                buffer: {
-                    type: "uniform",
-                },
-            },
-        ],
-    });
-
     /* Bind groups*/
     const uniformBufferSize = 4 * 16; // 4x4 matrix
     const uniformBuffer = device.createBuffer({
@@ -131,7 +143,7 @@ async function helloTriangle() {
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
     const uniformBindGroup = device.createBindGroup({
-        layout: bindGroupLayout,
+        layout: renderPipeline.getBindGroupLayout(0),
         entries: [
             {
                 binding: 0,
