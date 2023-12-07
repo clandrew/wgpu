@@ -141,6 +141,26 @@ async function helloTriangle() {
             },
         ],
     });
+    let transformationMatrix = new ArrayBuffer(4 * 16);
+    transformationMatrix[0] = 1;
+    transformationMatrix[1] = 0;
+    transformationMatrix[2] = 0;
+    transformationMatrix[3] = 0;
+
+    transformationMatrix[4] = 0;
+    transformationMatrix[5] = 1;
+    transformationMatrix[6] = 0;
+    transformationMatrix[7] = 0;
+
+    transformationMatrix[8] = 0;
+    transformationMatrix[9] = 0;
+    transformationMatrix[10] = 1;
+    transformationMatrix[11] = 0;
+
+    transformationMatrix[12] = 0;
+    transformationMatrix[13] = 0;
+    transformationMatrix[14] = 0;
+    transformationMatrix[15] = 1;
     
     /*** Rendering ***/
     
@@ -163,6 +183,15 @@ async function helloTriangle() {
     
     /* GPUQueue */
     const queue = device.queue;
+
+    device.queue.writeBuffer(
+        uniformBuffer, /* buffer */
+        0, /* buffer offset */
+        transformationMatrix, /* data */
+        0, /* data offset */
+        uniformBufferSize /* size */
+    );
+
     queue.submit([commandBuffer]);
 }
 
