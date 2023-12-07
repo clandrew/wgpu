@@ -1,4 +1,5 @@
 async function helloTriangle() {
+
     if (!navigator.gpu || GPUBufferUsage.COPY_SRC === undefined) {
         document.body.className = 'error';
         return;
@@ -31,26 +32,16 @@ async function helloTriangle() {
 
                      @vertex fn vsmain(@builtin(vertex_index) VertexIndex: u32) -> Vertex
                      {
-                         var xdisp = 0.3f;
-                         var ydisp0 = -0.4f;
-                         var ydisp1 = 0.4f;
 
-
-                         var pos: array<vec2<f32>, 9> = array<vec2<f32>, 9>(
-                             vec2<f32>( 0.0-xdisp,  0.5-ydisp0),
-                             vec2<f32>(-0.5-xdisp, -0.5-ydisp0),
-                             vec2<f32>( 0.5-xdisp, -0.5-ydisp0),
-
-                             vec2<f32>( 0.0+xdisp,  0.5-ydisp0),
-                             vec2<f32>(-0.5+xdisp, -0.5-ydisp0),
-                             vec2<f32>( 0.5+xdisp, -0.5-ydisp0),
-
-                             vec2<f32>( 0.0,  0.5-ydisp1),
-                             vec2<f32>(-0.5, -0.5-ydisp1),
-                             vec2<f32>( 0.5, -0.5-ydisp1)
+                         var pos: array<vec2<f32>, 3> = array<vec2<f32>, 3>(
+                             vec2<f32>( 0.0,  0.5),
+                             vec2<f32>(-0.5, -0.5),
+                             vec2<f32>( 0.5, -0.5)
                          );
                          var vertex_out : Vertex;
                          vertex_out.Position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);
+
+                         // Here: multiply projection
 
                          vertex_out.color = vec4<f32>(1.0, 0.0, 0.0, 1.0);
 
@@ -119,6 +110,37 @@ async function helloTriangle() {
     
     /* GPURenderPassDescriptor */
     const renderPassDescriptor = { colorAttachments: [colorAttachmentDescriptor] };
+
+    /* Bind group layout*/
+    const bindGroupLayout = device.createBindGroupLayout({
+        entries: [
+            {
+                binding: 0,
+                visibility: GPUShaderStage.FRAGMENT | GPUShaderStage.VERTEX,
+                buffer: {
+                    type: "uniform",
+                },
+            },
+        ],
+    });
+
+    /* Bind groups*/
+    const uniformBufferSize = 4 * 16; // 4x4 matrix
+    const uniformBuffer = device.createBuffer({
+        size: uniformBufferSize,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+    const uniformBindGroup = device.createBindGroup({
+        layout: bindGroupLayout,
+        entries: [
+            {
+                binding: 0,
+                resource: {
+                    buffer: uniformBuffer,
+                },
+            },
+        ],
+    });
     
     /*** Rendering ***/
     
@@ -128,11 +150,12 @@ async function helloTriangle() {
     const renderPassEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     
     renderPassEncoder.setPipeline(renderPipeline);
+
+    renderPassEncoder.setBindGroup(0, uniformBindGroup);
+
     const vertexBufferSlot = 0;
     renderPassEncoder.setVertexBuffer(vertexBufferSlot, vertexBuffer, 0);
     renderPassEncoder.draw(3, 1, 0, 0); // 3 vertices, 1 instance, 0th vertex, 0th instance.
-    renderPassEncoder.draw(3, 1, 3, 0);
-    renderPassEncoder.draw(3, 1, 6, 0); 
     renderPassEncoder.end();
     
     /* GPUComamndBuffer */
