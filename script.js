@@ -37,14 +37,40 @@ async function helloTriangle() {
 
                      @vertex fn vsmain(@builtin(vertex_index) VertexIndex: u32) -> Vertex
                      {
-                         var pos: array<vec2<f32>, 3> = array<vec2<f32>, 3>(
-                             vec2<f32>( 0.0,  0.5),
-                             vec2<f32>(-0.5, -0.5),
-                             vec2<f32>( 0.5, -0.5)
+                        // Note: Top right is positive
+                        //       Lower left is negative
+                        // All triangles are oriented counter-clockwise.
+
+                        var near = 0.5f;
+                        var far = 1.0f;
+                        var left = -0.5f;
+                        var right = 0.5f;
+                        var top = 0.5f;
+                        var bottom = -0.5f;
+
+                         var pos: array<vec3<f32>, 36> = array<vec3<f32>, 36>(
+                             vec3<f32>( left, top, near), vec3<f32>(left, bottom, near), vec3<f32>( right, top, near),                // Front face
+                             vec3<f32>( left, bottom, near), vec3<f32>(right, bottom, near), vec3<f32>( right, top, near),
+
+                             vec3<f32>( right, top, near), vec3<f32>(right, bottom, near), vec3<f32>( right, top, far),                // Right face
+                             vec3<f32>( right, bottom, near), vec3<f32>(right, bottom, far), vec3<f32>( right, top, far),
+
+                             vec3<f32>( right, top, far), vec3<f32>(right, bottom, far), vec3<f32>( left, top, far),                // Back face
+                             vec3<f32>( right, bottom, far), vec3<f32>(left, bottom, far), vec3<f32>( right, top, far),
+
+                             vec3<f32>( left, top, far), vec3<f32>(left, bottom, far), vec3<f32>( left, top, near),                // Left face
+                             vec3<f32>( left, bottom, far), vec3<f32>(left, bottom, near), vec3<f32>( left, top, near),
+
+                             vec3<f32>( left, top, far), vec3<f32>(left, top, near), vec3<f32>( right, top, far),                // Top face
+                             vec3<f32>( left, top, near), vec3<f32>(right, top, far), vec3<f32>( right, top, near),
+
+                             vec3<f32>( left, bottom, near), vec3<f32>(left, bottom, far), vec3<f32>( right, bottom, near),                // Bottom face
+                             vec3<f32>( left, bottom, far), vec3<f32>(right, bottom, near), vec3<f32>( right, bottom, far),
+                             
                          );
 
                          var vertex_out : Vertex;
-                         vertex_out.Position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);
+                         vertex_out.Position = vec4<f32>(pos[VertexIndex], 1.0);
 
                          vertex_out.Position = uniforms.modelViewProjectionMatrix * vertex_out.Position;
 
@@ -151,13 +177,13 @@ async function helloTriangle() {
         ],
     });
     const transformationMatrix = new Float32Array(16);
-    transformationMatrix[0] = 2;
+    transformationMatrix[0] = 1;
     transformationMatrix[1] = 0;
     transformationMatrix[2] = 0;
     transformationMatrix[3] = 0;
 
     transformationMatrix[4] = 0;
-    transformationMatrix[5] = 2;
+    transformationMatrix[5] = 1;
     transformationMatrix[6] = 0;
     transformationMatrix[7] = 0;
 
@@ -195,7 +221,7 @@ async function helloTriangle() {
 
     const vertexBufferSlot = 0;
     renderPassEncoder.setVertexBuffer(vertexBufferSlot, vertexBuffer, 0);
-    renderPassEncoder.draw(3, 1, 0, 0); // 3 vertices, 1 instance, 0th vertex, 0th instance.
+    renderPassEncoder.draw(36, 1, 0, 0); // 36 vertices
     renderPassEncoder.end();
     
     /* GPUComamndBuffer */
