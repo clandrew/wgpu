@@ -41,8 +41,8 @@ async function helloTriangle() {
                         //       Lower left is negative
                         // All triangles are oriented counter-clockwise.
 
-                        var near = 0.5f;
-                        var far = 1.0f;
+                        var near = -0.5f;
+                        var far = 0.5f;
                         var left = -0.5f;
                         var right = 0.5f;
                         var top = 0.5f;
@@ -62,10 +62,10 @@ async function helloTriangle() {
                              vec3<f32>( left, bottom, far), vec3<f32>(left, bottom, near), vec3<f32>( left, top, near),
 
                              vec3<f32>( left, top, far), vec3<f32>(left, top, near), vec3<f32>( right, top, far),                // Top face
-                             vec3<f32>( left, top, near), vec3<f32>(right, top, far), vec3<f32>( right, top, near),
+                             vec3<f32>( left, top, near), vec3<f32>(right, top, near), vec3<f32>( right, top, far),
 
-                             vec3<f32>( left, bottom, near), vec3<f32>(left, bottom, far), vec3<f32>( right, bottom, near),                // Bottom face
-                             vec3<f32>( left, bottom, far), vec3<f32>(right, bottom, near), vec3<f32>( right, bottom, far),
+                             vec3<f32>( left, bottom, near), vec3<f32>(left, bottom, far), vec3<f32>( right, bottom, far),                // Bottom face
+                             vec3<f32>( left, bottom, near), vec3<f32>(right, bottom, far), vec3<f32>( right, bottom, near),
                              
                          );
 
@@ -119,7 +119,7 @@ async function helloTriangle() {
         layout: pipelineLayout,
         vertex: vertexStageDescriptor,
         fragment: fragmentStageDescriptor,
-        primitive: {topology: "triangle-list" },
+        primitive: {topology: "triangle-list", cullMode: "back" },
     };
     /* GPURenderPipeline */
     const renderPipeline = device.createRenderPipeline(renderPipelineDescriptor);
