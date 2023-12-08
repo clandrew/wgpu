@@ -177,25 +177,25 @@ async function helloTriangle() {
         ],
     });
     const transformationMatrix = new Float32Array(16);
-    transformationMatrix[0] = 1;
-    transformationMatrix[1] = 0;
-    transformationMatrix[2] = 0;
-    transformationMatrix[3] = 0;
+    transformationMatrix[0] = 0.606977582;
+    transformationMatrix[1] = 0.328901350;
+    transformationMatrix[2] = 0.377071857;
+    transformationMatrix[3] = -0.00431854231;
 
     transformationMatrix[4] = 0;
-    transformationMatrix[5] = 1;
-    transformationMatrix[6] = 0;
-    transformationMatrix[7] = 0;
+    transformationMatrix[5] = 1.26013029;
+    transformationMatrix[6] = 0.382399917;
+    transformationMatrix[7] = 0.00470635295;
 
-    transformationMatrix[8] = 0;
-    transformationMatrix[9] = 0;
-    transformationMatrix[10] = 1;
-    transformationMatrix[11] = 0;
+    transformationMatrix[8] = -0.340623081;
+    transformationMatrix[9] = 0.586089909;
+    transformationMatrix[10] = 0.671927929;
+    transformationMatrix[11] = -0.00769548072;
 
-    transformationMatrix[12] = 0;
-    transformationMatrix[13] = 0;
-    transformationMatrix[14] = 0;
-    transformationMatrix[15] = 1;
+    transformationMatrix[12] = 0.2;
+    transformationMatrix[13] = -0.1;
+    transformationMatrix[14] = 0.6;
+    transformationMatrix[15] = 1.1;
     
     /*** Rendering ***/
 
