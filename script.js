@@ -72,17 +72,17 @@ async function helloTriangle() {
                          var vertex_out : Vertex;
                          vertex_out.Position = vec4<f32>(pos[VertexIndex], 1.0);
 
+                         vertex_out.color = vertex_out.Position;
+
                          vertex_out.Position = uniforms.modelViewProjectionMatrix * vertex_out.Position;
+
 
                          return vertex_out;
                      }
 
                      @fragment fn fsmain(in: Vertex) -> @location(0) vec4<f32>
                      {
-                         var r  = sin(in.Position.x / 10.0f);
-                         var g  = sin(in.Position.y / 10.0f);
-                         var b  = cos((in.Position.x + in.Position.y) / 10.0f);
-                         var outColor = vec4<f32>(r, g, b, 1.0);
+                         var outColor = in.color;
 
                          return outColor;
                      }
