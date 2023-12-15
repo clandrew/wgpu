@@ -72,7 +72,7 @@ async function helloTriangle() {
                          var vertex_out : Vertex;
                          vertex_out.Position = vec4<f32>(pos[VertexIndex], 1.0);
 
-                         vertex_out.color = vertex_out.Position;
+                         vertex_out.color = vertex_out.Position;                         
 
                          vertex_out.Position = uniforms.modelViewProjectionMatrix * vertex_out.Position;
 
@@ -194,7 +194,7 @@ async function helloTriangle() {
 
     transformationMatrix[12] = 0.2;
     transformationMatrix[13] = -0.1;
-    transformationMatrix[14] = 0.6;
+    transformationMatrix[14] = 0.5;
     transformationMatrix[15] = 1.1;
     
     /*** Rendering ***/
